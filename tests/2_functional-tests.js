@@ -60,6 +60,7 @@ suite('Functional Tests', function() {
                 assert.equal(res.status, 200)
                 assert.property(res.body, 'stockData');
                 assert.isArray(res.body.stockData);
+                assert.property(res.body.stockData[0], "rel_likes")
                 assert.equal(res.body.stockData.length, 2);
                 done();
             })
@@ -75,8 +76,7 @@ suite('Functional Tests', function() {
                 assert.property(res.body, 'stockData');
                 assert.isArray(res.body.stockData);
                 assert.equal(res.body.stockData.length, 2);
-                assert.equal(res.body.stockData[1].likes, currentDISLikes+1)
-                assert.equal(res.body.stockData[0].likes, currentTSLALikes+1)
+                assert.property(res.body.stockData[0], "rel_likes")
                 done();
             })
         })

@@ -46,23 +46,38 @@ module.exports = function (app) {
   }
 
   async function compareStocks(stocks, like, ip) {
-    let results = [];
 
-    for (let i = 0; i < 2; i++) {
-      let stock = stocks[i]
-      let stockData = {}
-      const { symbol, latestPrice } = await getStock(stock);
-      if(!symbol) {
-        stockData = { likes: like ? 1 : 0 }
-      }
-      else {
-        let savedStock = await saveStock(stock, like, ip)
-        stockData = { 'stock': symbol, 'price': latestPrice, 'likes': savedStock.likes.length }
-        results.push(stockData);
-      }
-    }
+    let stock1 = await getStock(stocks[0]);
+    let stock2 = await getStock(stocks[1]);
+
+    let stock1Likes = 0;
+    let stock2Likes = 0;
+
+    let stock1Data = {}
+    let stock2Data = {}
     
-    return results
+    if(!stock1.symbol) {
+      stock1Likes = 1;
+    }
+    else {
+      let savedStock = await saveStock(stocks[0], like, ip);
+      stock1Likes = savedStock.likes.length;
+      stock1Data = { "stock": stock1.symbol, "price": stock1.latestPrice }
+    }
+
+    if(!stock2.symbol) {
+      stock2Likes = 1;
+    }
+    else {
+      let savedStock = await saveStock(stocks[1], like, ip);
+      stock2Likes = savedStock.likes.length
+      stock2Data = { "stock": stock2.symbol, "price": stock2.latestPrice }
+    }
+
+    stock1Data["rel_likes"] = stock1Likes - stock2Likes;
+    stock2Data["rel_likes"] = stock2Likes - stock1Likes;
+
+    return [stock1Data, stock2Data]
   }
 
 
