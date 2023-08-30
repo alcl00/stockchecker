@@ -8,33 +8,35 @@ chai.use(chaiHttp);
 suite('Functional Tests', function() {
 
     suite('Test GET /api/stock-prices/', function() {
-        let currentGOOGLikes;
+        let currentGOOGLikes = 0;
         test('Viewing one stock', function(done) {
             chai.request(server)
             .keepOpen()
             .get('/api/stock-prices?stock=GOOG')
-            .end(function(err,res) {
+            .end((err,res) => {
                 assert.equal(res.status, 200)
-                assert.property(res.body, 'stock');
-                assert.property(res.body, 'price');
-                assert.property(res.body, 'likes');
-                currentGOOGLikes = res.body.likes;                
+                assert.property(res.body, 'stockData');
+                assert.property(res.body.stockData, 'stock');
+                assert.property(res.body.stockData, 'price');
+                assert.property(res.body.stockData, 'likes');
+                currentGOOGLikes = res.body.stockData.likes;
+                done();                
             })
-            done();
         });
         test('Viewing one stock and liking it', function(done) {
             chai.request(server)
             .keepOpen()
             .get('/api/stock-prices?stock=GOOG&like=True')
-            .end(function(err,res) {
+            .end((err,res) => {
                 assert.equal(res.status, 200)
-                assert.property(res.body, 'stock');
-                assert.property(res.body, 'price');
-                assert.property(res.body, 'likes');
-                assert.equal(res.body.likes, currentGOOGLikes+1)
+                assert.property(res.body, 'stockData');
+                assert.property(res.body.stockData, 'stock');
+                assert.property(res.body.stockData, 'price');
+                assert.property(res.body.stockData, 'likes');
+                assert.equal(res.body.stockData.likes, currentGOOGLikes+1)
                 currentGOOGLikes = res.body.likes
+                done();
             })
-            done();
         })
         test('Viewing the same stock and liking it again', function(done) {
             chai.request(server)
@@ -42,37 +44,41 @@ suite('Functional Tests', function() {
             .get('/api/stock-prices?stock=GOOG&like=True')
             .end(function(err,res) {
                 assert.equal(res.status, 200)
-                assert.property(res.body, 'stock');
-                assert.property(res.body, 'price');
-                assert.property(res.body, 'likes');
+                assert.property(res.body.stockData, 'stock');
+                assert.property(res.body.stockData, 'price');
+                assert.property(res.body.stockData, 'likes');
                 assert.equal(res.body.likes, currentGOOGLikes);
+                done();
             })
-            done();
         })
+        currentMSFTLikes = 0;
         test('Viewing two stocks', function(done) {
             chai.request(server)
             .keepOpen()
             .get('/api/stock-prices?stock=GOOG&stock=MSFT')
             .end(function(err,res) {
                 assert.equal(res.status, 200)
-                assert.property(res.body, 'stock');
-                assert.isArray(res.body.stocks);
-                assert.equal(res.body.stocks.length, 2);
-
+                assert.property(res.body, 'stockData');
+                assert.isArray(res.body.stockData);
+                assert.equal(res.body.stockData.length, 2);
+                done();
             })
-            done();
         })
         test('Viewing two stocks and liking them', function(done) {
             chai.request(server)
             .keepOpen()
-            .get('/api/stock-prices?stock=GOOG&stock=MSFT&like=True')
+            .get('/api/stock-prices?stock=TSLA&stock=DIS&like=True')
             .end(function(err,res) {
+                let currentDISLikes = 0;
+                let currentTSLALikes = 0;
                 assert.equal(res.status, 200)
-                assert.property(res.body, 'stock');
-                assert.isArray(res.body.stocks);
-                assert.equal(res.body.stocks.length, 2);
+                assert.property(res.body, 'stockData');
+                assert.isArray(res.body.stockData);
+                assert.equal(res.body.stockData.length, 2);
+                assert.equal(res.body.stockData[1].likes, currentDISLikes+1)
+                assert.equal(res.body.stockData[0].likes, currentTSLALikes+1)
+                done();
             })
-            done();
         })
     });
 });
