@@ -3,7 +3,7 @@ require('dotenv').config();
 const express     = require('express');
 const bodyParser  = require('body-parser');
 const cors        = require('cors');
-const helmet = require('helmet')
+const helmet = require("helmet");
 
 const apiRoutes         = require('./routes/api.js');
 const fccTestingRoutes  = require('./routes/fcctesting.js');
@@ -12,11 +12,14 @@ require('./db-connection')
 
 const app = express();
 
-app.use('/public', express.static(process.cwd() + '/public'));
-
+app.use(helmet.xssFilter());
 app.use(helmet.contentSecurityPolicy({ directives: {
   defaultSrc: ["'self'"]
 }}));
+
+app.use('/public', express.static(process.cwd() + '/public'));
+
+app.use(helmet.xssFilter())
 
 app.use(cors({origin: '*'})); //For FCC testing purposes only
 
