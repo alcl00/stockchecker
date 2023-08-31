@@ -55,7 +55,6 @@ module.exports = function (app) {
 
     let stock1Data = {}
     let stock2Data = {}
-    
     if(!stock1.symbol) {
       stock1Likes = 1;
     }
@@ -73,10 +72,9 @@ module.exports = function (app) {
       stock2Likes = savedStock.likes.length
       stock2Data = { "stock": stock2.symbol, "price": stock2.latestPrice }
     }
-
     stock1Data["rel_likes"] = stock1Likes - stock2Likes;
     stock2Data["rel_likes"] = stock2Likes - stock1Likes;
-
+    
     return [stock1Data, stock2Data]
   }
 
